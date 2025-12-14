@@ -11,9 +11,11 @@ st.markdown("""
         font-family: 'Arial', sans-serif;
     }
     .title {
+        
         color: #ffeaa7;
         font-size: 48px;
         text-align: center;
+        
         font-weight: bold;
         text-shadow: 2px 2px 8px rgba(0,0,0,0.3);                                
         margin-bottom: 20px;
@@ -76,11 +78,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Header1
+# H1
 st.markdown('<div class="title">🧮 Selamat Datang di Kalkulator Sederhana</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Aplikasi kalkulator interaktif dengan fitur multi-page untuk kemudahan dan efisiensi Anda</div>', unsafe_allow_html=True)
 
-# Layout/container
+# Layout
 col1, col2 = st.columns(2)
 
 with col1:
@@ -92,6 +93,7 @@ with col2:
     st.markdown('<div class="card"><h3>📜 Riwayat Perhitungan</h3><p>Lihat dan kelola riwayat kalkulasi Anda yang tersimpan selama sesi ini.</p></div>', unsafe_allow_html=True)
     if st.button("Lihat Riwayat", key="riwayat"):
         st.switch_page("pages/riwayat.py")  
+        
 
 col3, col4 = st.columns(2)
 
@@ -102,4 +104,6 @@ with col3:
 
 with col4:
     st.markdown('<div class="card"><h3>🧭 Navbar</h3><p>Gunakan sidebar untuk berpindah halaman dengan cepat dan intuitif.</p><p style="font-size:14px; color:#999;">Sidebar tersedia di sisi kiri layar.</p></div>', unsafe_allow_html=True)
-   
+
+col5 = st.columns(1)
+
