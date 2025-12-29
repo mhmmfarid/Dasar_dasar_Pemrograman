@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from utils import calculate_risk, risk_category
 
 # =======================
@@ -11,7 +12,13 @@ st.set_page_config(
 )
 
 # =======================
-# GLOBAL STYLE (AMAN + HOVER)
+# BASE DIRECTORY (AMAN UNTUK DEPLOY)
+# =======================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+IMAGE_PATH = os.path.join(BASE_DIR, "assets", "img1.jpg")
+
+# =======================
+# GLOBAL STYLE
 # =======================
 st.markdown("""
 <style>
@@ -19,7 +26,6 @@ st.markdown("""
     background-color: #f8f9fa;
 }
 
-/* CARD ANIMATION */
 .feature-card {
     background-color: #d3d3d3;
     padding: 30px 20px;
@@ -40,7 +46,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =======================
-# SIDEBAR NAVIGATION
+# SIDEBAR
 # =======================
 st.sidebar.title("🩺 Cek Risiko Diabetes")
 page = st.sidebar.selectbox(
@@ -65,22 +71,19 @@ if page == "Home":
 
     st.write(
         "Aplikasi ini membantu mengevaluasi risiko diabetes berdasarkan "
-        "data pribadi sederhana seperti usia, BMI, aktivitas fisik, dan "
-        "riwayat keluarga."
+        "usia, BMI, aktivitas fisik, dan riwayat keluarga."
     )
 
     st.divider()
-
     st.subheader("✨ Fitur Utama Aplikasi")
 
-    # ===== 3 FEATURE CARDS (ANIMASI HOVER)
     col1, col2, col3 = st.columns(3)
 
     with col1:
         st.markdown("""
         <div class="feature-card">
             📝<br><br>
-            Yuk! Input Data Sederhana
+            Input Data Sederhana
         </div>
         """, unsafe_allow_html=True)
 
@@ -88,7 +91,7 @@ if page == "Home":
         st.markdown("""
         <div class="feature-card">
             📊<br><br>
-            Lalu, Kalkulasi Risikonya
+            Kalkulasi Risiko
         </div>
         """, unsafe_allow_html=True)
 
@@ -96,18 +99,21 @@ if page == "Home":
         st.markdown("""
         <div class="feature-card">
             💡<br><br>
-            Dan Cek Saran Pencegahan
+            Saran Pencegahan
         </div>
         """, unsafe_allow_html=True)
 
     st.divider()
 
-    # ===== IMAGE
-    st.image(
-        "assets/img1.jpg",
-        caption="Cegah diabetes sejak dini",
-        use_container_width=True
-    )
+    # ===== IMAGE (AMAN SAAT DEPLOY)
+    if os.path.exists(IMAGE_PATH):
+        st.image(
+            IMAGE_PATH,
+            caption="Cegah diabetes sejak dini",
+            use_container_width=True
+        )
+    else:
+        st.warning("Gambar tidak ditemukan. Pastikan folder assets ada di GitHub.")
 
 # =======================
 # INPUT DATA PAGE
@@ -135,7 +141,7 @@ elif page == "Input Data":
             "family_history": family_history,
             "activity_level": activity_level
         }
-        st.success("Data berhasil disimpan. Lanjut ke Kalkulasi Risiko.")
+        st.success("Data berhasil disimpan.")
 
 # =======================
 # CALCULATION PAGE
@@ -144,15 +150,14 @@ elif page == "Kalkulasi Risiko":
     st.title("🔍 Kalkulasi Risiko Diabetes")
 
     if not st.session_state.user_data:
-        st.warning("Isi data terlebih dahulu di halaman Input Data.")
+        st.warning("Isi data terlebih dahulu.")
     else:
-        st.subheader("Data Pengguna")
         st.json(st.session_state.user_data)
 
         if st.button("Hitung Risiko"):
             score = calculate_risk(st.session_state.user_data)
             st.session_state.risk_score = score
-            st.success("Perhitungan selesai. Lihat hasil di halaman Hasil.")
+            st.success("Perhitungan selesai.")
 
 # =======================
 # RESULT PAGE
@@ -161,7 +166,7 @@ elif page == "Hasil":
     st.title("📊 Hasil Evaluasi Risiko Diabetes")
 
     if st.session_state.risk_score is None:
-        st.warning("Lakukan perhitungan risiko terlebih dahulu.")
+        st.warning("Lakukan perhitungan terlebih dahulu.")
     else:
         score = st.session_state.risk_score
         category = risk_category(score)
@@ -169,37 +174,13 @@ elif page == "Hasil":
         st.metric("Skor Risiko", score)
         st.subheader(f"Tingkat Risiko: {category}")
 
-        st.markdown("""
-        **Interpretasi Skor Risiko:**
-        - **Skor < 30** → Risiko diabetes **rendah**
-        - **Skor 30 – 59** → Risiko diabetes **sedang**
-        - **Skor ≥ 60** → Risiko diabetes **tinggi**
-        """)
-
         if category == "Rendah":
-            st.success(
-                "Risiko Anda tergolong **rendah**. " 
-                "Hal ini menunjukkan bahwa faktor risiko diabetes saat ini " 
-                "masih minimal. Tetap pertahankan pola hidup sehat."
-            )
+            st.success("Risiko rendah. Pertahankan gaya hidup sehat.")
         elif category == "Sedang":
-            st.warning(
-                "Risiko Anda berada pada tingkat **sedang**. " 
-                "Disarankan untuk mulai memperbaiki pola makan, " 
-                "meningkatkan aktivitas fisik, dan melakukan pemeriksaan " 
-                "kesehatan secara berkala."
-            )
+            st.warning("Risiko sedang. Mulai perbaiki pola hidup.")
         else:
-            st.error(
-                "Risiko Anda tergolong **tinggi**. " 
-                "Hal ini menunjukkan adanya faktor risiko yang signifikan. " 
-                "Sangat disarankan untuk berkonsultasi dengan tenaga medis " 
-                "atau dokter untuk pemeriksaan lebih lanjut."
-            )
+            st.error("Risiko tinggi. Disarankan konsultasi ke tenaga medis.")
 
         st.info(
-            "⚠️ **Catatan:** Skor ini bersifat *estimasi* berdasarkan data " 
-            "yang dimasukkan dan **bukan diagnosis medis**. " 
-            "Hasil ini digunakan sebagai sarana edukasi dan kesadaran " 
-            "awal terhadap risiko diabetes."
+            "⚠️ Skor ini hanya estimasi dan bukan diagnosis medis."
         )
